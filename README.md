@@ -1,5 +1,7 @@
 # Vostok
 
+[![Build Status](https://travis-ci.org/Valve/vostok.png)](https://travis-ci.org/Valve/vostok)
+
 Sick pg import
 
 ## Installation
