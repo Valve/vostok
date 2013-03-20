@@ -45,6 +45,8 @@ However, what it does is insert rows at a sick rate.
 
 `
 10_000 rows inserted with AR - 18 seconds
+`
+`
 10_000 rows inserted with Vostok - 0.2 seconds
 `
 
