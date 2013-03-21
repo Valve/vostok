@@ -1,6 +1,7 @@
 # Vostok
 
 [![Build Status](https://travis-ci.org/Valve/vostok.png)](https://travis-ci.org/Valve/vostok)
+[![Coverage Status](https://coveralls.io/repos/Valve/vostok/badge.png?branch=master)](https://coveralls.io/r/Valve/vostok)
 
 Sick pg import
 
