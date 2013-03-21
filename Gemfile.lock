@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vostok (0.0.1)
+    vostok (0.0.2)
       pg
 
 GEM
