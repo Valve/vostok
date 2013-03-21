@@ -2,10 +2,16 @@ require 'pg'
 
 module Vostok
   class Import
-    attr_reader :connection, :pg_connection, :table
+    attr_reader :pg_connection, :table
 
     def initialize(connection)
-      @connection = connection
+      raise ArgumentError, 'Connection can not be null' unless connection
+      raise ArgumentError, 'Connection must be a Hash or a PG::Connection' unless (connection.is_a?(::Hash) || connection.is_a?(PG::Connection))
+      if connection.is_a? ::Hash
+        @pg_connection = PG::Connection.new(connection)
+      else
+        @pg_connection = connection
+      end
       @options = {batch_size: 1000}
     end
 
@@ -13,7 +19,7 @@ module Vostok
       validate_args(columns, values)
       @table = table
       begin
-        @pg_connection = PG::Connection.open(@connection)
+        @pg_connection.reset
         values.each_slice(options[:batch_size]) do |slice|
           sql = generate_sql(table, columns, slice)
           @pg_connection.exec(sql)
