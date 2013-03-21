@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'vostok' do
   before {
-    connection_stub = stub 'connection', reset: true, close: true
+    connection_stub = stub 'connection', close: true
     connection_stub.stub(:is_a?).with(PG::Connection).and_return(true)
     connection_stub.stub(:is_a?).with(Hash).and_return(false)
     PG::Connection.stub(:new).and_return(connection_stub)
@@ -56,12 +56,6 @@ describe 'vostok' do
       ->{import.start(:customers, [:a, :b], [[1,2,3], [1,2,3]])}.should raise_error ArgumentError
     end
 
-    it 'should reset pg_connection if it is not yet open' do
-      import.pg_connection.stub(:exec)
-      import.pg_connection.should_receive(:reset)
-      import.start(:customers, [:a], [[1]])
-    end
-
     it 'should call PG library with correct sql in one go' do
       sql = <<-eos
         insert into "customers" ("a","b") values('1','2'),('3','4')
@@ -92,7 +86,15 @@ describe 'vostok' do
       import.start(:customers, [:a, :b], [[1,2]]).should == 1
     end
 
-    it 'should close the connection' do
+    it 'should not close the connection if it has come from outside' do
+      pg_connection = PG::Connection.new(dbname: 'db1', user: 'dev')
+      import = Vostok::Import.new(pg_connection)
+      import.pg_connection.stub(:exec)
+      import.pg_connection.should_not_receive(:close)
+      import.start(:customers, [:a, :b], [[1,2]])
+    end
+
+    it 'should close the connection if it was created internally' do
       import.pg_connection.stub(:exec)
       import.pg_connection.should_receive(:close)
       import.start(:customers, [:a, :b], [[1,2]])

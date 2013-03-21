@@ -3,6 +3,7 @@ require 'pg'
 module Vostok
   class Import
     attr_reader :pg_connection, :table
+    @connection_external = false
 
     def initialize(connection)
       raise ArgumentError, 'Connection can not be null' unless connection
@@ -11,6 +12,7 @@ module Vostok
         @pg_connection = PG::Connection.new(connection)
       else
         @pg_connection = connection
+        @connection_external = true
       end
       @options = {batch_size: 1000}
     end
@@ -19,14 +21,13 @@ module Vostok
       validate_args(columns, values)
       @table = table
       begin
-        @pg_connection.reset
         values.each_slice(options[:batch_size]) do |slice|
           sql = generate_sql(table, columns, slice)
           @pg_connection.exec(sql)
         end
         values.length
       ensure
-        @pg_connection.close
+        @pg_connection.close unless @connection_external
       end
     end
 
