@@ -27,7 +27,27 @@ Vostok works directly with PG gem, no other dependencies
 
 require 'vostok'
 
+# this will create an instance of `PG::Connection` inside, open it, import data and close it
 import = Vostok::Import.new(dbname: 'test', user: 'developer', password: 'r00t')
+
+data = []
+1_000.times do
+  data << ['String', 99]
+end
+
+import.start(:customers, [:name, :balance], data)
+
+```
+
+### It is also possible to use external `PG::Connection`
+
+```ruby
+
+connection = get_external_pg_connection()
+
+# this will use given connection and will not try to close it
+import = Vostok::Import.new(connection)
+
 data = []
 1_000.times do
   data << ['String', 99]
@@ -41,7 +61,7 @@ What Vostok does not do:
 
 1. Run validations
 2. Integrates with your ORM
-3. Works with other DBs
+3. Works with databases, other than PostgreSQL
 4. Sanitizes your data
 
 However, what it does is insert rows at a sick rate.
